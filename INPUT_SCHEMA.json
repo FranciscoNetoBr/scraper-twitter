@@ -1,0 +1,13 @@
+{
+    "title": "Twitter Video Scraper Input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "username": {
+            "title": "Twitter Username",
+            "type": "string",
+            "description": "The Twitter username to scrape videos from"
+        }
+    },
+    "required": ["username"]
+}

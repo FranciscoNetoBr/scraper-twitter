@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "apify": "^3.1.8",
-    "puppeteer": "^21.5.0"
+    "puppeteer": "^21.11.0"
   }
 }
