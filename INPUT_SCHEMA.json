@@ -6,7 +6,8 @@
         "username": {
             "title": "Twitter Username",
             "type": "string",
-            "description": "The Twitter username to scrape videos from"
+            "description": "The Twitter username to scrape videos from",
+            "editor": "textfield"
         }
     },
     "required": ["username"]
