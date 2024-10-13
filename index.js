@@ -1,33 +1,36 @@
 const Apify = require('apify');
-const puppeteer = require('puppeteer');
 
 Apify.main(async () => {
-    // Log do caminho do Chromium
-    console.log('Caminho do Chromium:', puppeteer.executablePath());
-
-    // Iniciando o navegador com opções apropriadas
-    const browser = await puppeteer.launch({
-        executablePath: puppeteer.executablePath(),  // Caminho do Chromium
-        headless: true,  // Executar em modo headless
-        args: ['--no-sandbox', '--disable-setuid-sandbox']  // Argumentos necessários
-    });
-
-    const page = await browser.newPage();
-    
-    // Obtenha o usuário a partir da entrada do Apify
     const input = await Apify.getInput();
     const username = input.username;
 
-    // Acesse a página do Twitter do usuário
-    await page.goto(`https://twitter.com/${username}`, { waitUntil: 'networkidle2' });
-    
-    // Capturar o título da página
-    const title = await page.title();
-    console.log('Título da página:', title);
+    // Verifica se o username foi fornecido
+    if (!username) {
+        throw new Error('Por favor, forneça um username.');
+    }
 
-    // Aqui você pode adicionar mais lógica para extrair os dados que deseja
-    // ...
+    // Inicializa o request queue
+    const requestQueue = await Apify.openRequestQueue();
 
-    // Fechar o navegador
-    await browser.close();
+    // Adiciona a URL do perfil do Twitter à fila
+    await requestQueue.addRequest({ url: `https://twitter.com/${username}` });
+
+    // Inicia o crawler
+    const crawler = new Apify.CheerioCrawler({
+        requestQueue,
+        handleRequestFunction: async ({ request, $ }) => {
+            // Extrai informações da página usando jQuery
+            const title = $('title').text();
+            console.log('Título da página:', title);
+
+            // Aqui você pode adicionar mais lógica para extrair dados
+            // Por exemplo, tweets, likes, etc.
+        },
+        handleFailedRequestFunction: async ({ request }) => {
+            console.log(`Falhou ao processar ${request.url}`);
+        },
+    });
+
+    // Inicia o crawler
+    await crawler.run();
 });
