@@ -1,35 +1,30 @@
 const Apify = require('apify');
+const { PuppeteerCrawler } = require('crawlee');
 
 Apify.main(async () => {
     const input = await Apify.getInput();
     const username = input.username;
 
-    // Verifica se o username foi fornecido
     if (!username) {
-        throw new Error('Por favor, forneça um username.');
+        throw new Error('Please provide a username in the input.');
     }
 
-    // Inicializa o request queue
-    const requestQueue = await Apify.openRequestQueue();
-
-    // Adiciona a URL do perfil do Twitter à fila
-    await requestQueue.addRequest({ url: `https://twitter.com/${username}` });
-
-    // Inicia o crawler
-    const crawler = new Apify.CheerioCrawler({
-        requestQueue,
-        handleRequestFunction: async ({ request, $ }) => {
-            // Extrai informações da página usando jQuery
-            const title = $('title').text();
-            console.log('Título da página:', title);
-
-            // Aqui você pode adicionar mais lógica para extrair dados
-            // Por exemplo, tweets, likes, etc.
+    const crawler = new PuppeteerCrawler({
+        launchPuppeteerOptions: {
+            headless: true,
+        },
+        handleRequestFunction: async ({ request }) => {
+            console.log(`Crawling user: ${username}`);
+            // Adicione aqui a lógica para acessar e raspar os dados do Twitter
+            // Por exemplo, navegue até a URL do perfil do Twitter e colete as informações necessárias
         },
         handleFailedRequestFunction: async ({ request }) => {
-            console.log(`Falhou ao processar ${request.url}`);
+            console.log(`Request failed: ${request.url}`);
         },
     });
+
+    // Adiciona a URL do perfil do Twitter para a fila de requisições
+    await crawler.addRequest({ url: `https://twitter.com/${username}` });
 
     // Inicia o crawler
     await crawler.run();
