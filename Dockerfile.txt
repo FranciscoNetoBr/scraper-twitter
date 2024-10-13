@@ -1,16 +1,16 @@
 FROM apify/actor-node:20
 
-# Copy package.json and package-lock.json files
-COPY package*.json ./
+# Copiar os arquivos package.json e package-lock.json
+COPY package*.json ./ 
 
-# Install dependencies
-RUN npm install --quiet --only=prod --no-optional
+# Instalar dependências
+RUN npm install --quiet --no-optional 
 
-# Copy the rest of the application
-COPY . ./
+# Copiar o restante da aplicação
+COPY . ./ 
 
-# Run npm list to check installed packages
-RUN npm list || true
+# Executar npm list para verificar pacotes instalados (opcional, para depuração)
+RUN npm list || true 
 
-# Command to run the application
+# Comando para executar a aplicação
 CMD [ "node", "index.js" ]
